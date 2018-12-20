@@ -1,0 +1,3 @@
+# YANA - Yet Another Notes App
+Work in progress...
+

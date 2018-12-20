@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "416535604098",
+    "firebase_url": "https://yana-d5ee2.firebaseio.com",
+    "project_id": "yana-d5ee2",
+    "storage_bucket": "yana-d5ee2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:416535604098:android:d9be2f5aa5cd4df9",
+        "android_client_info": {
+          "package_name": "com.magicleon.yana"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "416535604098-q086u6tdb9o90sek1am2flkr5s8b888t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2rU97UIBd93yBwRBGMySd7WADOoJOT0o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
