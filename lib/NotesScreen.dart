@@ -7,16 +7,22 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesScreenState extends State<NotesScreen> {
+
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = AuthProvider.of(context).user;
 
     return Scaffold(
-      body: Center(
-        child: Container(
-          child: Text("Current user logged:${user.displayName}"),
+        body: Center(
+          child: Container(
+            child: Text("Current user logged:${user.displayName}"),
+          ),
         ),
-      ),
-    );
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.plus_one),
+          onPressed: () {
+            
+          },
+        ));
   }
 }
