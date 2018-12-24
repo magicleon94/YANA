@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "416535604098-0re7de92qd0gd82jaokiful4off8mbf2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.magicleon.yana",
+            "certificate_hash": "b64d319d6577fa85cef67994f3c7e013b0f93b7a"
+          }
+        },
+        {
           "client_id": "416535604098-q086u6tdb9o90sek1am2flkr5s8b888t.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "416535604098-q086u6tdb9o90sek1am2flkr5s8b888t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
