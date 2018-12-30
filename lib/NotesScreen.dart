@@ -60,18 +60,16 @@ class _NotesScreenState extends State<NotesScreen> {
   void createNote() {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => AuthProvider(
-            child: NoteEditor(
-              model: Note(),
-            ),
+            child: NoteEditor(),
             user: user)));
   }
 
   void editNote(DocumentSnapshot document) {
     Note note = Note.fromMap(document.data);
     note.uid = document.reference.documentID;
-
+ 
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
-            AuthProvider(child: NoteEditor(model: note), user: user)));
+            AuthProvider(child: NoteEditor(noteReference: document.documentID,), user: user)));
   }
 }

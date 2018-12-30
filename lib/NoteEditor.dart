@@ -2,47 +2,35 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:yana/AuthProvider.dart';
 import 'package:yana/Models/Note.dart';
+import 'package:yana/NoteEditForm.dart';
 import 'package:yana/Utils.dart';
 
 class NoteEditor extends StatefulWidget {
-  const NoteEditor({Key key, @required this.model}) : super(key: key);
+  const NoteEditor({Key key, this.noteReference}) : super(key: key);
   _NoteEditorState createState() => _NoteEditorState();
-  final Note model;
+  final String noteReference;
 }
 
 class _NoteEditorState extends State<NoteEditor> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _textController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-
-    if (!StringUtils.isNullOrEmpty(widget.model.title)) {
-      _titleController.text = widget.model.title;
-    }
-
-    if (!StringUtils.isNullOrEmpty(widget.model.text)) {
-      _textController.text = widget.model.text;
-    }
-  }
-
   Future<Null> saveNote() async {
     String title = _titleController.text;
     String text = _textController.text;
 
     if (!StringUtils.isNullOrEmpty(title) && !StringUtils.isNullOrEmpty(text)) {
-      widget.model.text = text;
-      widget.model.title = title;
+      Note note = Note(text: text, title: title);
+
       CollectionReference userNotes =
           Firestore.instance.collection(AuthProvider.of(context).user.uid);
 
       DocumentReference noteReference =
-          StringUtils.isNullOrEmpty(widget.model.uid)
+          StringUtils.isNullOrEmpty(widget.noteReference)
               ? userNotes.document()
-              : userNotes.document(widget.model.uid);
+              : userNotes.document(widget.noteReference);
 
-      await noteReference.setData(widget.model.toMap());
+      await noteReference.setData(note.toMap());
       Navigator.of(context).pop();
     }
   }
@@ -60,36 +48,28 @@ class _NoteEditorState extends State<NoteEditor> {
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: TextField(
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                  hintText: "Title",
-                  border: InputBorder.none,
-                ),
-                controller: _titleController,
-              ),
-            ),
-            Expanded(
-              flex: 10,
-              child: TextField(
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-                decoration: InputDecoration(
-                  hintText: "Body",
-                  border: InputBorder.none,
-                ),
-                controller: _textController,
-              ),
-            ),
-          ],
-        ),
+      body: FutureBuilder(
+        future: Firestore.instance
+            .collection(AuthProvider.of(context).user.uid)
+            .document(widget.noteReference)
+            .snapshots()
+            .first,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data != null && !StringUtils.isNullOrEmpty(widget.noteReference)) {
+              _titleController.text = snapshot.data["title"];
+              _textController.text = snapshot.data["text"];
+            }
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: new NoteEditForm(
+                  titleController: _titleController,
+                  textController: _textController),
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }
