@@ -40,7 +40,9 @@ class _NoteEditorState extends State<NoteEditor> {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        title: Text("New note"),
+        title: Text(StringUtils.isNullOrEmpty(widget.noteReference)
+            ? "New note"
+            : "Edit note"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.save),
@@ -56,7 +58,8 @@ class _NoteEditorState extends State<NoteEditor> {
             .first,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
-            if (snapshot.data != null && !StringUtils.isNullOrEmpty(widget.noteReference)) {
+            if (snapshot.data != null &&
+                !StringUtils.isNullOrEmpty(widget.noteReference)) {
               _titleController.text = snapshot.data["title"];
               _textController.text = snapshot.data["text"];
             }

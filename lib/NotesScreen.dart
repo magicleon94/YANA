@@ -4,6 +4,7 @@ import 'package:yana/AuthProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yana/NoteEditor.dart';
 import 'package:yana/Models/Note.dart';
+import 'package:yana/NoteTile.dart';
 
 class NotesScreen extends StatefulWidget {
   _NotesScreenState createState() => _NotesScreenState();
@@ -17,7 +18,9 @@ class _NotesScreenState extends State<NotesScreen> {
     user = AuthProvider.of(context).user;
 
     return Scaffold(
-      appBar: AppBar(title: Text("YANA"),),
+        appBar: AppBar(
+          title: Text("YANA"),
+        ),
         body: StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance.collection(user.uid).snapshots(),
           builder:
@@ -33,19 +36,12 @@ class _NotesScreenState extends State<NotesScreen> {
               default:
                 return ListView(
                   children: snapshot.data.documents
-                      .map<Widget>(
-                        (DocumentSnapshot document) => new ListTile(
-                              title:
-                                  Text(document.data["title"] ?? "<No title>"),
-                              subtitle: Text(
-                                document.data["text"] ?? "<No text>",
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                              onTap: () =>
-                                  editNote(document),
-                            ),
-                      )
+                      .map<Widget>((DocumentSnapshot document) => NoteTile(
+                                title: document.data["title"] ?? "<No title>",
+                                subtitle: document.data["text"] ?? "<No text>",
+                                onTap: () => editNote(document),
+                              )
+                          )
                       .toList(),
                 );
             }
@@ -59,17 +55,18 @@ class _NotesScreenState extends State<NotesScreen> {
 
   void createNote() {
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => AuthProvider(
-            child: NoteEditor(),
-            user: user)));
+        builder: (context) => AuthProvider(child: NoteEditor(), user: user)));
   }
 
   void editNote(DocumentSnapshot document) {
     Note note = Note.fromMap(document.data);
     note.uid = document.reference.documentID;
- 
+
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) =>
-            AuthProvider(child: NoteEditor(noteReference: document.documentID,), user: user)));
+        builder: (context) => AuthProvider(
+            child: NoteEditor(
+              noteReference: document.documentID,
+            ),
+            user: user)));
   }
 }

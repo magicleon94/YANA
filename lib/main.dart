@@ -1,8 +1,5 @@
-import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:yana/Routes/RouterProvider.dart';
-import 'package:yana/Routes/Routes.dart';
 import 'package:yana/SplashScreen.dart';
 import 'package:yana/NotesScreen.dart';
 import 'package:yana/LoginScreen.dart';
@@ -11,17 +8,16 @@ import 'package:yana/AuthProvider.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Router router = new Router();
-    Routes.configureRoutes(router);
-    RoutesProvider.router = router;
-
     return MaterialApp(
       title: 'Yet Another Notes App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColorDark: Color(0xFFD32F2F),
+        primaryColorLight: Color(0xFFFFCDD2),
+        primaryColor: Color(0xFFF44336),
+        accentColor: Color(0xFFFF5722),
+        dividerColor: Color(0xFFBDBDBD),
       ),
       home: MainPage(),
     );
