@@ -19,7 +19,7 @@ class NoteTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
             ),
-            onTap: () => onTap),
+            onTap: onTap),
       ),
     );
   }
