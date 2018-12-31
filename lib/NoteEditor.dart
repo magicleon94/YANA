@@ -9,6 +9,7 @@ class NoteEditor extends StatefulWidget {
   const NoteEditor({Key key, this.noteReference}) : super(key: key);
   _NoteEditorState createState() => _NoteEditorState();
   final String noteReference;
+  bool get isNewNote => StringUtils.isNullOrEmpty(noteReference);
 }
 
 class _NoteEditorState extends State<NoteEditor> {
@@ -19,20 +20,22 @@ class _NoteEditorState extends State<NoteEditor> {
     String title = _titleController.text;
     String text = _textController.text;
 
-    if (!StringUtils.isNullOrEmpty(title) && !StringUtils.isNullOrEmpty(text)) {
-      Note note = Note(text: text, title: title);
-
-      CollectionReference userNotes =
-          Firestore.instance.collection(AuthProvider.of(context).user.uid);
-
-      DocumentReference noteReference =
-          StringUtils.isNullOrEmpty(widget.noteReference)
-              ? userNotes.document()
-              : userNotes.document(widget.noteReference);
-
-      await noteReference.setData(note.toMap());
-      Navigator.of(context).pop();
+    if (StringUtils.isNullOrEmpty(title) && StringUtils.isNullOrEmpty(text)) {
+      final SnackBar snackBar = SnackBar(
+        content: Text("Cannot insert an empty note!"),
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
+      return;
     }
+    Note note = Note(text: text, title: title);
+    note.uid = widget.noteReference;
+
+    await Firestore.instance
+        .collection(AuthProvider.of(context).user.uid)
+        .document(note.uid)
+        .setData(note.toMap());
+
+    Navigator.of(context).pop();
   }
 
   @override
