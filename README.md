@@ -1,3 +1,5 @@
 # YANA - Yet Another Notes App
-Work in progress...
+Still a work in progress.
+
+The idea is to realize a sample notes app to support a talk about Flutter in the near future.
 
