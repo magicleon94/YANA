@@ -12,12 +12,14 @@ class NotesScreen extends StatefulWidget {
 
 class _NotesScreenState extends State<NotesScreen> {
   FirebaseUser user;
+  GlobalKey scaffoldKey = GlobalKey(debugLabel: "Scaffold key");
 
   @override
   Widget build(BuildContext context) {
     user = AuthProvider.of(context).user;
 
     return Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           title: Text("YANA"),
         ),
@@ -36,12 +38,50 @@ class _NotesScreenState extends State<NotesScreen> {
               default:
                 return ListView(
                   children: snapshot.data.documents
-                      .map<Widget>((DocumentSnapshot document) => NoteTile(
+                      .map<Widget>(
+                        (DocumentSnapshot document) => Dismissible(
+                              key: Key(document.documentID),
+                              background: Container(
+                                  color: Colors.red,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.only(left:16.0),
+                                        child: Icon(Icons.delete,color: Colors.white,),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(right:16.0),
+                                        child: Icon(Icons.delete,color: Colors.white,),
+                                      )
+                                    ],
+                                  )),
+                              child: NoteTile(
                                 title: document.data["title"] ?? "<No title>",
                                 subtitle: document.data["text"] ?? "<No text>",
                                 onTap: () => editNote(document),
-                              )
-                          )
+                              ),
+                              onDismissed: (_) async {
+                                Note deletedNote = await deleteNote(document);
+                                final SnackBar snackBar = SnackBar(
+                                  content: Text("Deleted"),
+                                  action: SnackBarAction(
+                                    label: "UNDO",
+                                    onPressed: () {
+                                      Firestore.instance
+                                          .collection(
+                                              AuthProvider.of(context).user.uid)
+                                          .document(deletedNote.uid)
+                                          .setData(deletedNote.toMap());
+                                    },
+                                  ),
+                                );
+
+                                Scaffold.of(context).showSnackBar(snackBar);
+                                setState(() {});
+                              },
+                            ),
+                      )
                       .toList(),
                 );
             }
@@ -68,5 +108,24 @@ class _NotesScreenState extends State<NotesScreen> {
               noteReference: document.documentID,
             ),
             user: user)));
+  }
+
+  Future<Note> deleteNote(DocumentSnapshot document) async {
+    Note deletedNote = Note(
+        uid: document.documentID,
+        title: document.data["title"],
+        text: document.data["text"]);
+
+    await Firestore.instance
+        .collection(AuthProvider.of(context).user.uid)
+        .document(document.documentID)
+        .delete()
+        .catchError((error) => Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text(error.toString()),
+              ),
+            ));
+
+    return deletedNote;
   }
 }
