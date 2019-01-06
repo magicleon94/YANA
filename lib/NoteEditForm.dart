@@ -19,33 +19,43 @@ class NoteEditForm extends StatefulWidget {
 class NoteEditFormState extends State<NoteEditForm> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child: TextField(
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              hintText: "Title",
-              border: InputBorder.none,
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            Expanded(
+              flex: 1,
+              child: TextField(
+                textInputAction: TextInputAction.next,
+                style: TextStyle(fontSize: 25),
+                decoration: InputDecoration(
+                  hintText: "Title",
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Color(0x44000000))
+                ),
+                controller: widget._titleController,
+              ),
             ),
-            controller: widget._titleController,
-          ),
-        ),
-        Expanded(
-          flex: 10,
-          child: TextField(
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-            decoration: InputDecoration(
-              hintText: "Body",
-              border: InputBorder.none,
+            Expanded(
+              flex: 10,
+              child: TextField(
+                maxLines: null,
+                autofocus: true,
+                keyboardType: TextInputType.multiline,
+                style: TextStyle(fontSize: 18),
+                decoration: InputDecoration(
+                  hintText: "Note",
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Color(0x44000000))
+                ),
+                controller: widget._textController,
+              ),
             ),
-            controller: widget._textController,
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

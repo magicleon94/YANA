@@ -50,17 +50,10 @@ class _NoteEditorState extends State<NoteEditor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
-        title: Text(StringUtils.isNullOrEmpty(widget.noteReference)
-            ? "New note"
-            : "Edit note"),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: saveNote,
-          )
-        ],
+        title: Text(widget.isNewNote ? "New note" : "Edit note"),
       ),
       body: FutureBuilder(
         future: Firestore.instance
@@ -75,16 +68,18 @@ class _NoteEditorState extends State<NoteEditor> {
               _titleController.text = snapshot.data["title"];
               _textController.text = snapshot.data["text"];
             }
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: new NoteEditForm(
+            return NoteEditForm(
                   titleController: _titleController,
-                  textController: _textController),
+                  textController: _textController,
             );
           } else {
             return Center(child: CircularProgressIndicator());
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.save),
+        onPressed: saveNote,
       ),
     );
   }

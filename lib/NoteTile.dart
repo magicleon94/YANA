@@ -9,9 +9,13 @@ class NoteTile extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      child: Center(
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Color(0x33000000)),
+          borderRadius: BorderRadius.circular(5)
+        ),
         child: ListTile(
             title: Text(title),
             subtitle: Text(

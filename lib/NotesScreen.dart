@@ -19,73 +19,64 @@ class _NotesScreenState extends State<NotesScreen> {
     user = AuthProvider.of(context).user;
 
     return Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
         key: scaffoldKey,
         appBar: AppBar(
           title: Text("YANA"),
         ),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance.collection(user.uid).snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Text("There was an error :("),
-              );
-            }
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return Center(child: CircularProgressIndicator());
-              default:
-                return ListView(
-                  children: snapshot.data.documents
-                      .map<Widget>(
-                        (DocumentSnapshot document) => Dismissible(
-                              key: Key(document.documentID),
-                              background: Container(
-                                  color: Colors.red,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.only(left:16.0),
-                                        child: Icon(Icons.delete,color: Colors.white,),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(right:16.0),
-                                        child: Icon(Icons.delete,color: Colors.white,),
-                                      )
-                                    ],
-                                  )),
-                              child: NoteTile(
-                                title: document.data["title"] ?? "<No title>",
-                                subtitle: document.data["text"] ?? "<No text>",
-                                onTap: () => editNote(document),
-                              ),
-                              onDismissed: (_) async {
-                                Note deletedNote = await deleteNote(document);
-                                final SnackBar snackBar = SnackBar(
-                                  content: Text("Deleted"),
-                                  action: SnackBarAction(
-                                    label: "UNDO",
-                                    onPressed: () {
-                                      Firestore.instance
-                                          .collection(
-                                              AuthProvider.of(context).user.uid)
-                                          .document(deletedNote.uid)
-                                          .setData(deletedNote.toMap());
-                                    },
-                                  ),
-                                );
-
-                                Scaffold.of(context).showSnackBar(snackBar);
-                                setState(() {});
-                              },
-                            ),
-                      )
-                      .toList(),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: StreamBuilder<QuerySnapshot>(
+            stream: Firestore.instance.collection(user.uid).snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("There was an error :("),
                 );
-            }
-          },
+              }
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return Center(child: CircularProgressIndicator());
+                default:
+                  return ListView(
+                    children: snapshot.data.documents
+                        .map<Widget>(
+                          (DocumentSnapshot document) => Dismissible(
+                                key: Key(document.documentID),
+                                child: NoteTile(
+                                  title: document.data["title"] ?? "<No title>",
+                                  subtitle:
+                                      document.data["text"] ?? "<No text>",
+                                  onTap: () => editNote(document),
+                                ),
+                                onDismissed: (_) async {
+                                  Note deletedNote = await deleteNote(document);
+                                  final SnackBar snackBar = SnackBar(
+                                    content: Text("Note deleted"),
+                                    action: SnackBarAction(
+                                      label: "UNDO",
+                                      onPressed: () {
+                                        Firestore.instance
+                                            .collection(AuthProvider.of(context)
+                                                .user
+                                                .uid)
+                                            .document(deletedNote.uid)
+                                            .setData(deletedNote.toMap());
+                                      },
+                                    ),
+                                  );
+
+                                  Scaffold.of(context).showSnackBar(snackBar);
+                                  setState(() {});
+                                },
+                              ),
+                        )
+                        .toList(),
+                  );
+              }
+            },
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
