@@ -54,6 +54,12 @@ class _NoteEditorState extends State<NoteEditor> {
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         title: Text(widget.isNewNote ? "New note" : "Edit note"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: saveNote,
+          )
+        ],
       ),
       body: FutureBuilder(
         future: Firestore.instance
@@ -69,17 +75,13 @@ class _NoteEditorState extends State<NoteEditor> {
               _textController.text = snapshot.data["text"];
             }
             return NoteEditForm(
-                  titleController: _titleController,
-                  textController: _textController,
+              titleController: _titleController,
+              textController: _textController,
             );
           } else {
             return Center(child: CircularProgressIndicator());
           }
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.save),
-        onPressed: saveNote,
       ),
     );
   }
