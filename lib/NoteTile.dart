@@ -13,17 +13,19 @@ class NoteTile extends StatelessWidget {
       padding: const EdgeInsets.all(4.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Color(0x33000000)),
+          border: Border.all(color: Theme.of(context).dividerColor),
           borderRadius: BorderRadius.circular(5)
         ),
-        child: ListTile(
-            title: Text(title),
-            subtitle: Text(
-              subtitle,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
-            onTap: onTap),
+        child: Center(
+          child: ListTile(
+              title: Text(title),
+              subtitle: Text(
+                subtitle,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+              onTap: onTap),
+        ),
       ),
     );
   }

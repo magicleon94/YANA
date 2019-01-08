@@ -13,12 +13,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Yet Another Notes App',
       theme: ThemeData(
-        primaryColorDark: Color(0xFFD32F2F),
-        primaryColorLight: Color(0xFFFFCDD2),
-        primaryColor: Color(0xFFF44336),
-        accentColor: Color(0xFFFF5722),
+        primaryColorDark: Color(0xFF388E3C),
+        primaryColorLight: Color(0xFFC8E6C9),
+        primaryColor: Color(0xFF4CAF50),
+        accentColor: Color(0xFF8BC34A),
         dividerColor: Color(0xFFBDBDBD),
-        backgroundColor: Color(0xFFFFFACE)
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.white)
       ),
       home: MainPage(),
     );

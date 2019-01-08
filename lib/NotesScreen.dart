@@ -5,14 +5,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yana/NoteEditor.dart';
 import 'package:yana/Models/Note.dart';
 import 'package:yana/NoteTile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotesScreen extends StatefulWidget {
   _NotesScreenState createState() => _NotesScreenState();
 }
 
 class _NotesScreenState extends State<NotesScreen> {
+  SharedPreferences prefs;
   FirebaseUser user;
   GlobalKey scaffoldKey = GlobalKey(debugLabel: "Scaffold key");
+  bool isGrid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _getPrefs();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +32,12 @@ class _NotesScreenState extends State<NotesScreen> {
         key: scaffoldKey,
         appBar: AppBar(
           title: Text("YANA"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(isGrid ? Icons.view_list : Icons.grid_on),
+              onPressed: () => toggleGrid(),
+            )
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -39,47 +54,68 @@ class _NotesScreenState extends State<NotesScreen> {
                 case ConnectionState.waiting:
                   return Center(child: CircularProgressIndicator());
                 default:
-                  return ListView(
-                    children: snapshot.data.documents
-                        .map<Widget>(
-                          (DocumentSnapshot document) => Dismissible(
-                                key: Key(document.documentID),
-                                child: NoteTile(
-                                  title: document.data["title"] ?? "<No title>",
-                                  subtitle:
-                                      document.data["text"] ?? "<No text>",
-                                  onTap: () => editNote(document),
-                                ),
-                                onDismissed: (_) async {
-                                  Note deletedNote = await deleteNote(document);
-                                  final SnackBar snackBar = SnackBar(
-                                    content: Text("Note deleted"),
-                                    action: SnackBarAction(
-                                      label: "UNDO",
-                                      onPressed: () {
-                                        Firestore.instance
-                                            .collection(AuthProvider.of(context)
-                                                .user
-                                                .uid)
-                                            .document(deletedNote.uid)
-                                            .setData(deletedNote.toMap());
-                                      },
+                  List<Widget> noteWidgets = snapshot.data.documents
+                      .map<Widget>(
+                        (DocumentSnapshot document) => Dismissible(
+                              direction: DismissDirection.endToStart,
+                              background: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(right:16.0),
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.black,
                                     ),
-                                  );
-
-                                  Scaffold.of(context).showSnackBar(snackBar);
-                                  setState(() {});
-                                },
+                                  )
+                                ],
                               ),
+                              key: Key(document.documentID),
+                              child: NoteTile(
+                                title: document.data["title"] ?? "<No title>",
+                                subtitle: document.data["text"] ?? "<No text>",
+                                onTap: () => editNote(document),
+                              ),
+                              onDismissed: (_) async {
+                                Note deletedNote = await deleteNote(document);
+                                final SnackBar snackBar = SnackBar(
+                                  content: Text("Note deleted"),
+                                  action: SnackBarAction(
+                                    label: "UNDO",
+                                    onPressed: () {
+                                      Firestore.instance
+                                          .collection(
+                                              AuthProvider.of(context).user.uid)
+                                          .document(deletedNote.uid)
+                                          .setData(deletedNote.toMap());
+                                    },
+                                  ),
+                                );
+
+                                Scaffold.of(context).showSnackBar(snackBar);
+                                setState(() {});
+                              },
+                            ),
+                      )
+                      .toList();
+                  return isGrid
+                      ? GridView.count(
+                          children: noteWidgets,
+                          crossAxisCount: 2,
+                          childAspectRatio: 2,
                         )
-                        .toList(),
-                  );
+                      : ListView(
+                          children: noteWidgets,
+                        );
               }
             },
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          child: Icon(
+            Icons.add,
+            color: Theme.of(context).iconTheme.color,
+          ),
           onPressed: createNote,
         ));
   }
@@ -118,5 +154,23 @@ class _NotesScreenState extends State<NotesScreen> {
             ));
 
     return deletedNote;
+  }
+
+  void toggleGrid() {
+    setState(() {
+      isGrid = !isGrid;
+      prefs.setBool("IS_GRID", isGrid);
+    });
+  }
+
+  Future<Null> _getPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    if (!prefs.getKeys().contains("IS_GRID")) {
+      prefs.setBool("IS_GRID", false);
+    } else {
+      setState(() {
+        isGrid = prefs.getBool("IS_GRID");
+      });
+    }
   }
 }
