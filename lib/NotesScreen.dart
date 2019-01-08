@@ -4,8 +4,8 @@ import 'package:yana/AuthProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yana/NoteEditor.dart';
 import 'package:yana/Models/Note.dart';
-import 'package:yana/NoteTile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yana/Views/NoteTile.dart';
 
 class NotesScreen extends StatefulWidget {
   _NotesScreenState createState() => _NotesScreenState();
@@ -28,96 +28,97 @@ class _NotesScreenState extends State<NotesScreen> {
     user = AuthProvider.of(context).user;
 
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
-        key: scaffoldKey,
-        appBar: AppBar(
-          title: Text("YANA"),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(isGrid ? Icons.view_list : Icons.grid_on),
-              onPressed: () => toggleGrid(),
-            )
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection(user.uid).snapshots(),
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text("There was an error :("),
-                );
-              }
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                  return Center(child: CircularProgressIndicator());
-                default:
-                  List<Widget> noteWidgets = snapshot.data.documents
-                      .map<Widget>(
-                        (DocumentSnapshot document) => Dismissible(
-                              direction: DismissDirection.endToStart,
-                              background: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(right:16.0),
-                                    child: Icon(
-                                      Icons.delete,
-                                      color: Colors.black,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              key: Key(document.documentID),
-                              child: NoteTile(
-                                title: document.data["title"] ?? "<No title>",
-                                subtitle: document.data["text"] ?? "<No text>",
-                                onTap: () => editNote(document),
-                              ),
-                              onDismissed: (_) async {
-                                Note deletedNote = await deleteNote(document);
-                                final SnackBar snackBar = SnackBar(
-                                  content: Text("Note deleted"),
-                                  action: SnackBarAction(
-                                    label: "UNDO",
-                                    onPressed: () {
-                                      Firestore.instance
-                                          .collection(
-                                              AuthProvider.of(context).user.uid)
-                                          .document(deletedNote.uid)
-                                          .setData(deletedNote.toMap());
-                                    },
+      backgroundColor: Theme.of(context).backgroundColor,
+      key: scaffoldKey,
+      appBar: AppBar(
+        title: Text("YANA"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(isGrid ? Icons.view_list : Icons.grid_on),
+            onPressed: () => _toggleGrid(),
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: Firestore.instance.collection(user.uid).snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text("There was an error :("),
+              );
+            }
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+              default:
+                List<Widget> noteWidgets = snapshot.data.documents
+                    .map<Widget>(
+                      (DocumentSnapshot document) => Dismissible(
+                            direction: DismissDirection.endToStart,
+                            background: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 16.0),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.black,
                                   ),
-                                );
-
-                                Scaffold.of(context).showSnackBar(snackBar);
-                                setState(() {});
-                              },
+                                )
+                              ],
                             ),
+                            key: Key(document.documentID),
+                            child: NoteTile(
+                              title: document.data["title"] ?? "<No title>",
+                              subtitle: document.data["text"] ?? "<No text>",
+                              onTap: () => editNote(document),
+                            ),
+                            onDismissed: (_) async {
+                              Note deletedNote = await deleteNote(document);
+                              final SnackBar snackBar = SnackBar(
+                                content: Text("Note deleted"),
+                                action: SnackBarAction(
+                                  label: "UNDO",
+                                  onPressed: () {
+                                    Firestore.instance
+                                        .collection(
+                                            AuthProvider.of(context).user.uid)
+                                        .document(deletedNote.uid)
+                                        .setData(deletedNote.toMap());
+                                  },
+                                ),
+                              );
+
+                              Scaffold.of(context).showSnackBar(snackBar);
+                              setState(() {});
+                            },
+                          ),
+                    )
+                    .toList();
+                return isGrid
+                    ? GridView.count(
+                        children: noteWidgets,
+                        crossAxisCount: 2,
+                        childAspectRatio: 2,
                       )
-                      .toList();
-                  return isGrid
-                      ? GridView.count(
-                          children: noteWidgets,
-                          crossAxisCount: 2,
-                          childAspectRatio: 2,
-                        )
-                      : ListView(
-                          children: noteWidgets,
-                        );
-              }
-            },
-          ),
+                    : ListView(
+                        children: noteWidgets,
+                      );
+            }
+          },
         ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.add,
-            color: Theme.of(context).iconTheme.color,
-          ),
-          onPressed: createNote,
-        ));
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).iconTheme.color,
+        ),
+        onPressed: createNote,
+      ),
+    );
   }
 
   void createNote() {
@@ -156,7 +157,7 @@ class _NotesScreenState extends State<NotesScreen> {
     return deletedNote;
   }
 
-  void toggleGrid() {
+  void _toggleGrid() {
     setState(() {
       isGrid = !isGrid;
       prefs.setBool("IS_GRID", isGrid);
