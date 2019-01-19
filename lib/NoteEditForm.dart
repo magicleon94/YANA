@@ -29,7 +29,7 @@ class NoteEditFormState extends State<NoteEditForm> {
               flex: 1,
               child: TextField(
                 textInputAction: TextInputAction.next,
-                style: TextStyle(fontSize: 25),
+                style: TextStyle(fontSize: 25,color: Theme.of(context).textTheme.title.color),
                 decoration: InputDecoration(
                   hintText: "Title",
                   border: InputBorder.none,
@@ -44,7 +44,7 @@ class NoteEditFormState extends State<NoteEditForm> {
                 maxLines: null,
                 autofocus: true,
                 keyboardType: TextInputType.multiline,
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 18,color: Theme.of(context).textTheme.body1.color),
                 decoration: InputDecoration(
                   hintText: "Note",
                   border: InputBorder.none,

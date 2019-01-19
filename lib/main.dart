@@ -19,7 +19,13 @@ class MyApp extends StatelessWidget {
         accentColor: Color(0xFF8BC34A),
         dividerColor: Color(0xFFBDBDBD),
         backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.white)
+        iconTheme: IconThemeData(color: Colors.white),
+        textTheme: TextTheme(
+          body1: TextStyle(color: Colors.black),
+          body2: TextStyle(color: Colors.black),
+          title: TextStyle(color: Colors.black),
+          subtitle: TextStyle(color: Colors.black),
+        )
       ),
       home: MainPage(),
     );
