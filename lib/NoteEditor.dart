@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:yana/AuthProvider.dart';
@@ -32,7 +34,6 @@ class _NoteEditorState extends State<NoteEditor> {
                     onPressed: () => Navigator.of(context).pop(),
                   )
                 ],
-                elevation: 10,
               ));
     } else {
       Note note = Note(text: text, title: title);
