@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:yana/AuthProvider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:yana/MyApp.dart';
 import 'package:yana/NoteEditor.dart';
 import 'package:yana/Models/Note.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +27,16 @@ class _NotesScreenState extends State<NotesScreen> {
     _getPrefs();
   }
 
+  void _signOut() async {
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    GoogleSignIn googleSignIn = new GoogleSignIn();
+
+    await firebaseAuth.signOut();
+    await googleSignIn.signOut();
+
+    runApp(MyApp());
+  }
+
   @override
   Widget build(BuildContext context) {
     user = AuthProvider.of(context).user;
@@ -38,6 +50,10 @@ class _NotesScreenState extends State<NotesScreen> {
           IconButton(
             icon: Icon(isGrid ? Icons.view_list : Icons.grid_on),
             onPressed: () => _toggleGrid(),
+          ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () => _signOut(),
           )
         ],
       ),
