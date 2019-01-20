@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 class NoteTile extends StatelessWidget {
   final String title;
   final String subtitle;
-  final Function onTap;
+  final Function onTapTile;
 
-  const NoteTile({Key key, this.title, this.subtitle, this.onTap})
+  const NoteTile({Key key, this.title, this.subtitle, this.onTapTile})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class NoteTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
               ),
-              onTap: onTap),
+              onTap: onTapTile),
         ),
       ),
     );

@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:yana/NoteEditor.dart';
 import 'package:yana/Models/Note.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:yana/Views/NoteTile.dart';
+import 'package:yana/Views/DismissibleTile.dart';
 
 class NotesScreen extends StatefulWidget {
   _NotesScreenState createState() => _NotesScreenState();
@@ -55,30 +55,15 @@ class _NotesScreenState extends State<NotesScreen> {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
                 return Center(child: CircularProgressIndicator());
-              default:
+              case ConnectionState.active:
                 List<Widget> noteWidgets = snapshot.data.documents
                     .map<Widget>(
-                      (DocumentSnapshot document) => Dismissible(
-                          direction: DismissDirection.endToStart,
-                          background: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(right: 16.0),
-                                child: Icon(
-                                  Icons.delete,
-                                  color: Colors.black,
-                                ),
-                              )
-                            ],
-                          ),
-                          key: Key(document.documentID),
-                          child: NoteTile(
-                            title: document.data["title"] ?? "<No title>",
-                            subtitle: document.data["text"] ?? "<No text>",
-                            onTap: () => editNote(document),
-                          ),
-                          onDismissed: (_) {
+                      (DocumentSnapshot document) => DismissibleTile(
+                          documentID: document.documentID,
+                          title: document.data["title"] ?? "<No title>",
+                          subtitle: document.data["text"] ?? "<No text>",
+                          onTapTile: () => editNote(context, document),
+                          onDismiss: (_) {
                             _deleteNote(context, document);
                           }),
                     )
@@ -92,6 +77,14 @@ class _NotesScreenState extends State<NotesScreen> {
                     : ListView(
                         children: noteWidgets,
                       );
+              case ConnectionState.done:
+                return Center(
+                  child: Text("Connection was closed."),
+                );
+              case ConnectionState.none:
+                return Center(
+                  child: Text("There's no connection."),
+                );
             }
           },
         ),
@@ -101,21 +94,21 @@ class _NotesScreenState extends State<NotesScreen> {
           Icons.add,
           color: Theme.of(context).iconTheme.color,
         ),
-        onPressed: createNote,
+        onPressed: () => createNote(context),
       ),
     );
   }
 
-  void createNote() {
-    Navigator.of(context).push(MaterialPageRoute(
+  void createNote(BuildContext buildContext) {
+    Navigator.of(buildContext).push(MaterialPageRoute(
         builder: (context) => AuthProvider(child: NoteEditor(), user: user)));
   }
 
-  void editNote(DocumentSnapshot document) {
+  void editNote(BuildContext buildContext, DocumentSnapshot document) {
     Note note = Note.fromMap(document.data);
     note.uid = document.reference.documentID;
 
-    Navigator.of(context).push(MaterialPageRoute(
+    Navigator.of(buildContext).push(MaterialPageRoute(
         builder: (context) => AuthProvider(
             child: NoteEditor(
               noteReference: document.documentID,
