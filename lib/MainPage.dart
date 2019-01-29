@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:yana/AuthProvider.dart';
 import 'package:yana/LoginScreen.dart';
 import 'package:yana/NotesScreen.dart';
-import 'package:yana/SplashScreen.dart';
+import 'package:yana/LoadingScreen.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key key}) : super(key: key);
@@ -18,7 +18,7 @@ class _MainPageState extends State<MainPage> {
       stream: FirebaseAuth.instance.onAuthStateChanged,
       builder: (BuildContext context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return new SplashScreen();
+          return new LoadingScreen();
         } else {
           if (snapshot.hasData) {
             return AuthProvider(child: NotesScreen(), user: snapshot.data);
