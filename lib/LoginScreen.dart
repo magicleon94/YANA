@@ -13,13 +13,17 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   void _authenticateWithGoogle() async {
-    final GoogleSignInAccount googleUser = await widget.googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    await widget.firebaseAuth.signInWithGoogle(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+    try{
+      final GoogleSignInAccount googleUser = await widget.googleSignIn.signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      await widget.firebaseAuth.signInWithGoogle(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+    }catch(exception){
+      //pass
+    }
   }
 
   @override
